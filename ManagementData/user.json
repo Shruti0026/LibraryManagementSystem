@@ -1,0 +1,82 @@
+[
+  {
+    "id": 15126,
+    "username": "JHall",
+    "name": "Jaeho Komppa",
+    "age": 43
+  },
+  {
+    "id": 15127,
+    "username": "ACharleston",
+    "name": "Monica Mauser",
+    "age": 45
+  },
+  {
+    "id": 15128,
+    "username": "JWhatley",
+    "name": "Cathryn Woods",
+    "age": 41
+  },
+  {
+    "id": 15129,
+    "username": "VBrinson",
+    "name": "Minnita Pyle",
+    "age": 34
+  },
+  {
+    "id": 15130,
+    "username": "LTapia",
+    "name": "Danny Loya",
+    "age": 42
+  },
+  {
+    "id": 15131,
+    "username": "FKephart",
+    "name": "Sucharitha Dehaven",
+    "age": 18
+  },
+  {
+    "id": 15132,
+    "username": "LBouchard",
+    "name": "Percy Holcombe",
+    "age": 44
+  },
+  {
+    "id": 15133,
+    "username": "SRichardson",
+    "name": "Tamika Boynton",
+    "age": 38
+  },
+  {
+    "id": 15134,
+    "username": "JThomason",
+    "name": "Antoinette Reitz",
+    "age": 21
+  },
+  {
+    "id": 15135,
+    "username": "YPick",
+    "name": "Gabriela Snow",
+    "age": 31
+  },
+  {
+    "name": "gayatri",
+    "email": "gayatri@a.net",
+    "gender": "female",
+    "phone_no": 986554654,
+    "address": "road 81",
+    "DOB": "21/10/2000",
+    "user_type": "user",
+    "password": "jsdc54"
+  },
+  {
+    "name": "Aniket",
+    "email": "aniket@a.net",
+    "gender": "male",
+    "phone_no": 76668455744,
+    "address": "road 81",
+    "DOB": "10/04/1998",
+    "user_type": "user",
+    "password": "shg577"
+  }
+]
