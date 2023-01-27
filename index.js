@@ -1,21 +1,49 @@
 require("dotenv").config();
+const bookRouter = require('./bookServices/bookRouter')
 const { request } = require("express");
 const express = require('express')
-const Joi = require("joi");
-
-const bodyParser = require('body-parser');
+const PORT = process.env.PORT || 3004;
 const fs = require("fs")
-const bookRouter = require('./bookServices/bookRouter')
-const userRouter = require('./userServices/userRouter')
-
 const app = express()
+const { genSaltSync, hashSync, compareSync } = require("bcrypt")
+const swaggerJsDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express');
 
 app.use(express.json());
 
+const swaggerOptions = {
+    swaggerDefinition: {
+        openapi: "3.0.0",
+        info: {
+            title: 'Library Management API',
+            description: "Library Management API System",
+            version: "1.0.0"
+        },
+        servers: [{
+            url: "http://localhost:3004"
+        }]
+    },
+    apis: ['./bookServices/*.js']
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
-app.get('/', (req, resp) => {
-    resp.send('Welcome to Library Management System')
+/**
+ * @swagger
+ * /book:
+ *  get:
+ *      summary: this api is to check if get method is working
+ *      description: this api is to check if get method is working
+ *      responses: 
+ *          200:
+ *              description: to test get method
+ */
+
+app.get('/book', (req, res) => {
+    res.send('Welcome to Library Management System')
+    console.log("inside book api")
 })
 
 app.get('/bookData', function(req, res) {
@@ -38,8 +66,10 @@ app.get('/userData', function(req, res) {
     })
 })
 
-//signup api for user login details 
+
+
 app.post('/sign_up', function(req, res) {
+    const salt = genSaltSync(10)
     const user = {
         "name": req.body.name,
         "email": req.body.email,
@@ -48,7 +78,7 @@ app.post('/sign_up', function(req, res) {
         "address": req.body.address,
         "DOB": req.body.DOB,
         "user_type": req.body.user_type,
-        "password": req.body.password
+        "password": hashSync(req.body.password, salt)
     }
     const rawdata = fs.readFileSync('./ManagementData/user.json')
     const jsonData = JSON.parse(rawdata)
@@ -65,16 +95,28 @@ app.post('/sign_up', function(req, res) {
 })
 
 
-app.use("/bookRouter", bookRouter)
-app.use("/user", userRouter)
-
-
+app.use("/book", bookRouter)
 
 
 process.on('uncaughtException', function(err) {
     console.log(err.name, err.message);
 })
 
-app.listen(process.env.APP_PORT, () => {
-    console.log("server up and running on PORT:", process.env.APP_PORT);
-});
+const mongoose = require('mongoose')
+
+const DB_URI = 'mongodb://mongo:27017/ManagementData';
+
+mongoose.set("strictQuery", true);
+mongoose
+    .connect(DB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
+        console.log("Connected! to port: ", +PORT);
+        app.listen(PORT)
+    })
+    .catch((err) => {
+        console.log("oh no error");
+        console.log(err.name);
+    });
