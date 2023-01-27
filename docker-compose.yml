@@ -1,0 +1,20 @@
+version: '3'
+services:
+    web:
+        image: "docker-library-m-s"
+        build: .
+        command: "node index.js"
+        ports: 
+            - "3004:3004"
+        depends_on:
+            - "mongo"
+    mongo:
+        image: "mongo"
+        ports:
+            - "27017:27017"
+        volumes:
+            - db:/data/db
+
+volumes:
+
+    db:
