@@ -8,6 +8,8 @@ const app = express()
 const { genSaltSync, hashSync, compareSync } = require("bcrypt")
 const swaggerJsDoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express');
+const redis = require("redis");
+const client = redis.createClient();
 
 app.use(express.json());
 
@@ -42,17 +44,28 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  */
 
 app.get('/book', (req, res) => {
+
     res.send('Welcome to Library Management System')
     console.log("inside book api")
 })
 
+const DEFAULT_EXPIRATION = 3600
 app.get('/bookData', function(req, res) {
-    fs.readFile('./ManagementData/books.json', 'utf8', function(err, data) {
-        if (err) {
-            return console.error(err);
+    client.get("bookData", async(error, bookData) => {
+        if (error) console.error(error)
+        if (bookData != null) {
+            console.log("cache hit")
+            return res.json(JSON.parse(bookData))
+        } else {
+            fs.readFile('./ManagementData/books.json', 'utf8', function(err, data) {
+                if (err) {
+                    return console.error(err);
+                }
+                data = JSON.parse(data, null, 2);
+                res.end(JSON.stringify(data));
+                client.setex("bookData", DEFAULT_EXPIRATION, JSON.stringify(data))
+            })
         }
-        data = JSON.parse(data, null, 2);
-        res.end(JSON.stringify(data));
     })
 })
 
@@ -102,7 +115,8 @@ process.on('uncaughtException', function(err) {
     console.log(err.name, err.message);
 })
 
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const { error } = require("console");
 
 const DB_URI = 'mongodb://mongo:27017/ManagementData';
 
