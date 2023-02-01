@@ -1,4 +1,4 @@
-const { addNewBook, getBooksList, deleteBook } = require('./bookController')
+const { addNewBook, getBooksList, deleteBook, redis_book } = require('./bookController')
     //const fs = require("fs")
 const express = require("express");
 const app = express.Router();
@@ -63,7 +63,7 @@ app.get("/get", (req, res) => {
  *                  items:
  *                    $ref: '#/components/schemas/Books'
  */
-app.get("/getBooksList", getBooksList);
+app.get("/getBooksList", redis_book, getBooksList);
 
 /**
  * @swagger

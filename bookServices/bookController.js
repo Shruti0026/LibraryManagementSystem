@@ -1,7 +1,8 @@
 // const fs = require("fs")
 // const dataPath = './ManagementData/books.json'
 // const data = fs.readFileSync('./ManagementData/books.json')
-
+// const redis = require('redis')
+// const client = redis.createClient()
 const { Model } = require("mongoose");
 //const book = require("./Book")
 const Book = require('./Book')
@@ -20,11 +21,24 @@ const addNewBook = async(req, res) => {
     }
 }
 
+const redis_book = (req, res, next) => {
+    client.get('BookList', (err, redis_data) => {
+        if (err) {
+            throw err
+        } else if (redis_data) {
+            res.send(JSON.parse(redis_data))
+        } else {
+            next()
+        }
+    })
+}
+
 const getBooksList = async(req, res) => {
     try {
         const books = await Book.find()
         res.json(books)
         console.log("inside find router")
+        client.setEx('BookList', 3600, JSON.stringify(books))
     } catch (err) {
         res.status(500).json({ message: err.message })
     }
@@ -46,5 +60,6 @@ const deleteBook = async(req, res) => {
 module.exports = {
     addNewBook,
     getBooksList,
-    deleteBook
+    deleteBook,
+    redis_book
 }
