@@ -9,7 +9,14 @@ const { genSaltSync, hashSync, compareSync } = require("bcrypt")
 const swaggerJsDoc = require('swagger-jsdoc')
 const swaggerUi = require('swagger-ui-express');
 const redis = require("redis");
-const client = redis.createClient();
+const client = redis.createClient({
+    host: 'redis',
+    legacyMode: true,
+    port: 6379
+});
+
+client.on('error', err => console.log('Redis Client Error', err));
+client.on('connect', () => console.log('Redis Client connected'));
 
 app.use(express.json());
 
@@ -48,6 +55,35 @@ app.get('/book', (req, res) => {
     res.send('Welcome to Library Management System')
     console.log("inside book api")
 })
+
+const products = [
+    { productName: 'Laptop', price: 27 },
+    { productName: 'Charger', price: 32 },
+    { productName: 'mobile phone', price: 45 }
+]
+
+app.get('/productList', async(req, res) => {
+    try {
+        client.get('product', async(err, product) => {
+            if (err) {
+                console.error(err);
+                throw err;
+            }
+            if (product != null) {
+                console.log('products retrieved from Redis');
+                res.status(200).send(JSON.parse(product));
+            } else {
+                // const product = await products.find()
+                res.json(products)
+                client.setex('product', 600, JSON.stringify(products));
+                console.log('products retrieved from the API');
+            }
+        });
+    } catch (err) {
+        res.status(500).send({ error: err.message });
+    }
+})
+
 
 const DEFAULT_EXPIRATION = 3600
 app.get('/bookData', function(req, res) {
